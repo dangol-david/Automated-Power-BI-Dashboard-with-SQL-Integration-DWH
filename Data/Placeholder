@@ -1,1 +1,66 @@
+---------------------------------------------Automate Excel To Sql --------------------------------------------------------------
 
+-- Step 1: Create the table
+IF OBJECT_ID('Raw_Data.GDP') IS NOT NULL DROP TABLE Raw_Data_GDP
+
+CREATE TABLE Raw_Data_GDP
+(Demo_IND NVARCHAR(200),
+Indicator NVARCHAR(200),
+[Location] NVARCHAR(200),
+Country NVARCHAR(200),
+[Time] NVARCHAR(200),
+[Value] FLOAT,
+[Flag Codes] NVARCHAR(200),
+Flags NVARCHAR(200))
+
+-- Step 2: Import the Data
+BULK INSERT Raw_Data_GDP
+FROM 'C:\Users\user\Downloads\gdp_raw_data.csv'
+WITH (FORMAT='CSV');
+
+--SELECT * FROM Raw_Data_GDP
+
+-- Step 3: Create the view we need - This is a "one off"
+
+
+
+-- DROP VIEW GDP_Excel_Input
+
+CREATE VIEW GDP_Excel_Input AS
+
+SELECT a.*, b.GDP_Per_Capita FROM
+
+(SELECT Country, [Time] AS Year_No, [Value] AS GDP_Value FROM Raw_Data_GDP
+WHERE Indicator = 'GDP (current US$)') a
+LEFT JOIN
+(SELECT Country, [Time] AS Year_No, [Value] AS GDP_Per_Capita FROM Raw_Data_GDP
+WHERE Indicator = 'GDP per capita (current US$)' )b
+ON a.Country = b.Country AND a.Year_No = b.Year_No
+--/
+-- SELECT DISTINCT Indicator FROM Raw_Data.GDP
+
+
+
+---STEP 4 :  Creating  a Store Procedure
+
+Create PROCEDURE  GDP_Excel_Input_Monthly  AS
+
+IF OBJECT_ID('Raw_Data.GDP') IS NOT NULL DROP TABLE Raw_Data_GDP
+
+CREATE TABLE Raw_Data_GDP
+(Demo_IND NVARCHAR(200),
+Indicator NVARCHAR(200),
+[Location] NVARCHAR(200),
+Country NVARCHAR(200),
+[Time] NVARCHAR(200),
+[Value] FLOAT,
+[Flag Codes] NVARCHAR(200),
+Flags NVARCHAR(200))
+
+-- Step 2: Import the Data
+BULK INSERT Raw_Data_GDP
+FROM 'C:\Users\user\Downloads\gdp_raw_data.csv'
+WITH (FORMAT='CSV');
+
+
+----- EXEC GDP_Excel_Input_Monthly
